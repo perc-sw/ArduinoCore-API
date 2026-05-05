@@ -131,8 +131,8 @@ uint32_t millis(void);
 uint64_t micros(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
-unsigned long pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout);
-unsigned long pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
+uint64_t pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout);
+uint64_t pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
 
 void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
 uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
