@@ -36,11 +36,19 @@ typedef enum {
 } PinStatus;
 
 typedef enum {
-  INPUT            = 0x0,
-  OUTPUT           = 0x1,
-  INPUT_PULLUP     = 0x2,
-  INPUT_PULLDOWN   = 0x3,
-  OUTPUT_OPENDRAIN = 0x4,
+  // Normal Arduino API pin modes.
+  INPUT                  = 0x1,
+  INPUT_SCHMITT          = 0x2,
+  INPUT_PULLUP           = 0x3,
+  INPUT_SCHMITT_PULLUP   = 0x5,
+  INPUT_PULLDOWN         = 0x4,
+  INPUT_SCHMITT_PULLDOWN = 0x6,
+  // Drive strength modes added for Pico RP2040/RP2040
+  OUTPUT                 = 0x7,
+  OUTPUT_2mA             = 0x8,
+  OUTPUT_4mA             = 0x9,
+  OUTPUT_8mA             = 0xA,
+  OUTPUT_12mA            = 0xB
 } PinMode;
 
 typedef enum {
