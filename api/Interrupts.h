@@ -31,13 +31,15 @@ namespace arduino {
 template <typename T>
 using voidTemplateFuncPtrParam =  void (*)(T param);
 
-template<typename T> struct __container__ {
+template<typename T>
+struct __container__ {
   void* param;
   voidTemplateFuncPtrParam<T> function;
 };
 
 // C++ only overloaded version of attachInterrupt function
-template<typename T> void attachInterrupt(pin_size_t interruptNum, voidTemplateFuncPtrParam<T> userFunc, PinStatus mode, T& param) {
+template<typename T>
+void attachInterrupt(pin_size_t interruptNum, voidTemplateFuncPtrParam<T> userFunc, PinStatus mode, T& param) {
 
   struct __container__<T> *cont = new __container__<T>();
   cont->param = &param;
@@ -54,7 +56,8 @@ template<typename T> void attachInterrupt(pin_size_t interruptNum, voidTemplateF
   attachInterruptParam(interruptNum, f, mode, cont);
 }
 
-template<typename T> void attachInterrupt(pin_size_t interruptNum, voidTemplateFuncPtrParam<T*> userFunc, PinStatus mode, T* param) {
+template<typename T>
+void attachInterrupt(pin_size_t interruptNum, voidTemplateFuncPtrParam<T*> userFunc, PinStatus mode, T* param) {
   attachInterruptParam(interruptNum, (voidFuncPtrParam)userFunc, mode, (void*)param);
 }
 
