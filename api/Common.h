@@ -17,25 +17,26 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#pragma once
-#include <stdint.h>
-#include <stdbool.h>
+#ifndef ARDUINO_CORE_API_COMMON_H
+#define ARDUINO_CORE_API_COMMON_H
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include <algorithm>
+#include <cstdint>
+#include<limits>
+#include <type_traits>
+#include "compiler_features.h"
 
-void yield(void);
+void yield();
 
-typedef enum {
+enum PinStatus {
   LOW     = 0,
   HIGH    = 1,
   CHANGE  = 2,
   FALLING = 3,
   RISING  = 4,
-} PinStatus;
+};
 
-typedef enum {
+enum PinMode {
   INPUT                  = 0x0,
   INPUT_PULLUP           = 0x1,
   INPUT_PULLDOWN         = 0x2,
@@ -47,75 +48,227 @@ typedef enum {
   OUTPUT_4mA             = 0x8,
   OUTPUT_8mA             = 0x9,
   OUTPUT_12mA            = 0xA
-} PinMode;
+} ;
 
-typedef enum {
+enum BitOrder {
   LSBFIRST = 0,
   MSBFIRST = 1,
-} BitOrder;
+};
 
-#define PI          3.1415926535897932384626433832795
-#define HALF_PI     1.5707963267948966192313216916398
-#define TWO_PI      6.283185307179586476925286766559
-#define DEG_TO_RAD  0.017453292519943295769236907684886
-#define RAD_TO_DEG  57.295779513082320876798154814105
-#define EULER       2.718281828459045235360287471352
+#if HAS_MATH_CONSTANT_LIB()
+  #include <numbers>
+  template<typename T = double>
+  static CONSTEXPR auto PI           { std::numbers::pi_v<T> };
 
-#define SERIAL      0x0
-#define DISPLAY     0x1
+  template<typename T = double>
+  static CONSTEXPR auto HALF_PI      { PI<T> / static_cast<T>(2.0) };
 
-#ifndef constrain
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+  template<typename T = double>
+  static CONSTEXPR auto TWO_PI       { PI<T> * static_cast<T>(2.0) };
+
+  template<typename T = double>
+  static CONSTEXPR auto DEG_TO_RAD   { PI<T> / static_cast<T>(180.0) };
+
+  template<typename T = double>
+  static CONSTEXPR auto RAD_TO_DEG   { static_cast<T>(180.0) / PI<T> };
+
+  template<typename T = double>
+  static CONSTEXPR auto EULER        { std::numbers::e_v<T> };
+#else
+  static constexpr double PI          = 3.1415926535897932384626433832795;
+  static constexpr double HALF_PI     = 1.5707963267948966192313216916398;
+  static constexpr double TWO_PI      = 6.283185307179586476925286766559;
+  static constexpr double DEG_TO_RAD  = 0.017453292519943295769236907684886;
+  static constexpr double RAD_TO_DEG  = 57.295779513082320876798154814105;
+  static constexpr double EULER       = 2.718281828459045235360287471352;
 #endif
 
-#ifndef radians
-#define radians(deg) ((deg)*DEG_TO_RAD)
+static constexpr std::uint32_t SERIAL { 0x0ul };
+static constexpr std::uint32_t DISPLAY { 0x1ul };
+
+#if REQUIRED_CPP_STANDARD(CXX_STANDARD_20)
+  constexpr auto constrain(const auto value, const auto low, const auto high) -> decltype(auto){
+    return std::clamp(value, low, high);
+  };
+#else
+  template<typename T>
+  constexpr auto constrain(const T value, const T low, const T high) -> T {
+    return std::clamp(value, low, high);
+  }
 #endif
 
-#ifndef degrees
-#define degrees(rad) ((rad)*RAD_TO_DEG)
+#if REQUIRED_CPP_STANDARD(CXX_STANDARD_20)
+  constexpr auto radians(const auto deg) -> decltype(auto) {
+    using value_type = std::remove_cvref_t<decltype(deg)>;
+    return deg * DEG_TO_RAD<value_type>;
+  }
+#else
+  template<typename T>
+  constexpr auto radians(const T deg) -> T {
+    return deg * static_cast<T>(DEG_TO_RAD);
+  }
 #endif
 
-#ifndef sq
-#define sq(x) ((x)*(x))
+#if REQUIRED_CPP_STANDARD(CXX_STANDARD_20)
+  constexpr auto degrees(const auto rad) -> decltype(auto) {
+    using value_type = std::remove_cvref_t<decltype(rad)>;
+    return rad * RAD_TO_DEG<value_type>;
+  }
+#else
+  template<typename T>
+  constexpr auto degrees(const T rad) -> T {
+    return rad * static_cast<T>(RAD_TO_DEG);
+  }
 #endif
 
-typedef void (*voidFuncPtr)(void);
-typedef void (*voidFuncPtrParam)(void*);
+#if REQUIRED_CPP_STANDARD(CXX_STANDARD_20)
+  constexpr auto sq(const auto value) -> decltype(auto) {
+    return value * value;
+  }
+#else
+  template<typename T>
+  constexpr auto sq(const T value) -> T {
+    return value * value;
+  }
+#endif
+
+using voidFuncPtr = void (*)();
+using voidFuncPtrParam = void (*)(void*);
 
 // interrupts() / noInterrupts() must be defined by the core
 
-#define lowByte(w) ((uint8_t) ((w) & 0xff))
-#define highByte(w) ((uint8_t) ((w) >> 8))
+static constexpr std::uint8_t lowByte(const std::uint16_t w) { return w & 0xff; }
+static constexpr std::uint8_t highByte(const std::uint16_t w) { return w >> 8; }
 
-#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
-#define bitSet(value, bit) ((value) |= (1UL << (bit)))
-#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
-#define bitToggle(value, bit) ((value) ^= (1UL << (bit)))
-#define bitWrite(value, bit, bitvalue) ((bitvalue) ? bitSet((value), (bit)) : bitClear((value), (bit)))
+#if REQUIRED_CPP_STANDARD(CXX_STANDARD_20)
+static constexpr auto bitRead(const auto value, const std::size_t bit) -> bool {
+  using value_type = std::remove_cvref_t<decltype(value)>;
+  CONSTEXPR auto limit = std::numeric_limits<value_type>::digits;
+  if (bit >= limit) {
+    return static_cast<value_type>(0);
+  } else {
+    return ((value >> bit) & static_cast<value_type>(0x01)) > 0;
+  }
+}
+static constexpr void bitSet(const auto& value, const std::size_t bit) {
+  using value_type = std::remove_cvref_t<decltype(value)>;
+  CONSTEXPR auto limit = std::numeric_limits<value_type>::digits;
 
-#ifndef bit
-#define bit(b) (1UL << (b))
+  if (bit >= limit) {
+    return;
+  }
+
+  value |= (static_cast<value_type>(0b1) << bit);
+}
+static constexpr void bitClear(const auto& value, const std::size_t bit) {
+  using value_type = std::remove_cvref_t<decltype(value)>;
+  CONSTEXPR auto limit = std::numeric_limits<value_type>::digits;
+
+  if (bit >= limit) {
+    return;
+  }
+
+  value &= ~(static_cast<value_type>(0b1) << bit);
+}
+static constexpr void bitToggle(const auto& value, const std::size_t bit) {
+  using value_type = std::remove_cvref_t<decltype(value)>;
+  CONSTEXPR auto limit = std::numeric_limits<value_type>::digits;
+
+  if (bit >= limit) {
+    return;
+  }
+
+  value ^= (static_cast<value_type>(0b1) << bit);
+}
+static constexpr void bitWrite(const auto& value, const std::size_t bit, const bool bitset) {
+  using value_type = std::remove_cvref_t<decltype(value)>;
+  if (bitset) {
+    bitSet(value, bit);
+  } else {
+    bitClear(value, bit);
+  }
+}
+#else
+
+template<typename T>
+static constexpr auto bitRead(const T value, const std::size_t bit) -> bool {
+  using value_type = std::remove_reference_t<std::remove_cv_t<T>>;
+  constexpr auto limit = std::numeric_limits<value_type>::digits;
+  if (bit >= limit) {
+    return static_cast<value_type>(0);
+  } else {
+    return ((value >> bit) & static_cast<value_type>(0x01)) > 0;
+  }
+}
+
+template<typename T>
+static constexpr void bitSet(const T& value, const std::size_t bit) {
+  using value_type = std::remove_reference_t<std::remove_cv_t<decltype(value)>>;
+  constexpr auto limit = std::numeric_limits<value_type>::digits;
+
+  if (bit >= limit) {
+    return;
+  }
+
+  value |= (static_cast<value_type>(0b1) << bit);
+}
+
+template<typename T>
+static constexpr void bitClear(const T& value, const std::size_t bit) {
+  using value_type = std::remove_reference_t<std::remove_cv_t<decltype(value)>>;
+  constexpr auto limit = std::numeric_limits<value_type>::digits;
+
+  if (bit >= limit) {
+    return;
+  }
+
+  value &= ~(static_cast<value_type>(0b1) << bit);
+}
+
+template<typename T>
+static constexpr void bitToggle(const T& value, const std::size_t bit) {
+  using value_type = std::remove_reference_t<std::remove_cv_t<decltype(value)>>;
+  constexpr auto limit = std::numeric_limits<value_type>::digits;
+
+  if (bit >= limit) {
+    return;
+  }
+
+  value ^= (static_cast<value_type>(0b1) << bit);
+}
+
+template<typename T>
+static constexpr void bitWrite(const T& value, const std::size_t bit, const bool bitset) {
+  if (bitset) {
+    bitSet(value, bit);
+  } else {
+    bitClear(value, bit);
+  }
+}
+
 #endif
 
-/* TODO: request for removal */
-typedef bool      boolean;
-typedef uint8_t   byte;
-typedef uint16_t  word;
+template<typename T = std::uint32_t>
+static constexpr auto bit(const std::size_t b) -> T {
+  return static_cast<T>(0b1) << b;
+}
 
-void init(void);
-void initVariant(void);
+using byte = std::uint8_t;
+
+void init();
+void initVariant();
 
 #ifndef HOST
-int atexit(void (*func)()) __attribute__((weak));
+int atexit(void (*)()) __attribute__((weak));
 #endif
-int main() __attribute__((weak));
+
+[[noreturn]] int main() __attribute__((weak));
 
 #ifdef EXTENDED_PIN_MODE
 // Platforms who want to declare more than 256 pins need to define EXTENDED_PIN_MODE globally
-typedef uint32_t pin_size_t;
+using pin_size_t = std::uint32_t;
 #else
-typedef uint8_t pin_size_t;
+using pin_size_t = std::uint8_t;
 #endif
 
 void pinMode(pin_size_t pinNumber, PinMode pinMode);
@@ -125,72 +278,50 @@ int analogRead(pin_size_t pinNumber);
 void analogReference(uint8_t mode);
 void analogWrite(pin_size_t pinNumber, int value);
 
-unsigned long millis(void);
-unsigned long micros(void);
-void delay(unsigned long);
-void delayMicroseconds(unsigned int us);
-unsigned long pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout);
-unsigned long pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
+std::uint32_t millis();
+std::uint64_t micros();
+void delay(std::uint32_t ms);
+void delayMicroseconds(std::uint64_t us);
+std::uint32_t pulseIn(pin_size_t pin, uint8_t state, std::uint32_t timeout  = 1000000L);
+std::uint64_t pulseInLong(pin_size_t pin, uint8_t state, std::uint64_t timeout  = 1000000L);
 
 void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
-uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
+std::uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
 
 void attachInterrupt(pin_size_t interruptNumber, voidFuncPtr callback, PinStatus mode);
 void attachInterruptParam(pin_size_t interruptNumber, voidFuncPtrParam callback, PinStatus mode, void* param);
 void detachInterrupt(pin_size_t interruptNumber);
 
-void setup(void);
-void loop(void);
+void setup();
+[[noreturn]] void loop();
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
+template<typename T>
+constexpr auto min(const T& a, const T& b){ return std::min(a, b); };
 
-#ifdef __cplusplus
-  template<class T, class L> 
-  auto min(const T& a, const L& b) -> decltype((b < a) ? b : a)
-  {
-    return (b < a) ? b : a;
-  }
-
-  template<class T, class L> 
-  auto max(const T& a, const L& b) -> decltype((b < a) ? b : a)
-  {
-    return (a < b) ? b : a;
-  }
-#else
-#ifndef min
-#define min(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a < _b ? _a : _b; })
-#endif
-#ifndef max
-#define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
-#endif
-#endif
-
-#ifdef __cplusplus
+template<typename T>
+constexpr auto max(const T& a, const T& b){ return std::max(a, b); };
 
 /* C++ prototypes */
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
 
-#define word(...) makeWord(__VA_ARGS__)
+template<typename ... Ts>
+std::uint16_t word(const Ts ... values) {
+  static_assert(sizeof...(values) <= 2, "word() takes at most 2 arguments");
+  return makeWord(values...);
+}
 
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
-unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
+//
+// std::uint32_t pulseIn(uint8_t pin, uint8_t state, std::uint32_t timeout = 1000000L);
+// std::uint64_t pulseInLong(uint8_t pin, uint8_t state, std::uint64_t timeout = 1000000L);
 
-void tone(uint8_t _pin, unsigned int frequency, unsigned long duration = 0);
+void tone(uint8_t _pin, std::uint32_t frequency, std::uint32_t duration = 0);
 void noTone(uint8_t _pin);
 
 // WMath prototypes
-long random(long);
-long random(long, long);
-void randomSeed(unsigned long);
-long map(long, long, long, long, long);
+long random(std::int32_t);
+long random(std::int32_t, std::int32_t);
+void randomSeed(std::uint32_t);
+long map(std::int32_t, std::int32_t, std::int32_t, std::int32_t, std::int32_t);
 
-#endif // __cplusplus
+#endif
