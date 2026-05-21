@@ -18,8 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Binary_h
-#define Binary_h
+#ifndef ARDUINO_CORE_API_BINARY_H
+#define ARDUINO_CORE_API_BINARY_H
 
 /* If supported, 0b binary literals are preferable to these constants.
  * In that case, warn the user about these being deprecated (if possible). */
