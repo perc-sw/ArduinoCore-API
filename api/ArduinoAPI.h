@@ -48,7 +48,7 @@
 
 // Misc Arduino core functions
 #include "Common.h"
-
+#include "compiler_features.h"
 #ifdef __cplusplus
 // Compatibility layer for older code
 #include "Compat.h"
