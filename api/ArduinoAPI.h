@@ -17,15 +17,19 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef ARDUINO_API_H
-#define ARDUINO_API_H
+#ifndef ARDUINO_CORE_API_ARDUINO_API_H
+#define ARDUINO_CORE_API_ARDUINO_API_H
 
 // version 1.5.2
 #define ARDUINO_API_VERSION 10502
 
-#include "Binary.h"
+// Standard C++ libraries.
+#include <cstdlib>
+#include <cstdint>
+#include <cstring>
+#include <cmath>
 
-#ifdef __cplusplus
+#include "Binary.h"
 #include "Interrupts.h"
 #include "IPAddress.h"
 #include "Print.h"
@@ -37,21 +41,10 @@
 #include "Udp.h"
 #include "USBAPI.h"
 #include "WCharacter.h"
-#endif
-
-/* Standard C library includes */
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <math.h>
 
 // Misc Arduino core functions
 #include "Common.h"
 #include "compiler_features.h"
-#ifdef __cplusplus
-// Compatibility layer for older code
 #include "Compat.h"
-#endif
 
-#endif
+#endif  // ARDUINO_CORE_API_ARDUINO_API_H
