@@ -28,7 +28,7 @@
 
 void yield();
 
-enum PinStatus {
+enum PinStatus : std::uint8_t {
   LOW     = 0,
   HIGH    = 1,
   CHANGE  = 2,
@@ -36,7 +36,7 @@ enum PinStatus {
   RISING  = 4,
 };
 
-enum PinMode {
+enum PinMode : std::uint8_t{
   INPUT                  = 0x0,
   INPUT_PULLUP           = 0x1,
   INPUT_PULLDOWN         = 0x2,
@@ -50,7 +50,7 @@ enum PinMode {
   OUTPUT_12mA            = 0xA
 } ;
 
-enum BitOrder {
+enum BitOrder : std::uint8_t {
   LSBFIRST = 0,
   MSBFIRST = 1,
 };
@@ -311,17 +311,13 @@ std::uint16_t word(const Ts ... values) {
   return makeWord(values...);
 }
 
-//
-// std::uint32_t pulseIn(uint8_t pin, uint8_t state, std::uint32_t timeout = 1000000L);
-// std::uint64_t pulseInLong(uint8_t pin, uint8_t state, std::uint64_t timeout = 1000000L);
-
 void tone(uint8_t _pin, std::uint32_t frequency, std::uint32_t duration = 0);
 void noTone(uint8_t _pin);
 
 // WMath prototypes
-long random(std::int32_t);
-long random(std::int32_t, std::int32_t);
+std::int32_t random(std::int32_t);
+std::int32_t random(std::int32_t, std::int32_t);
 void randomSeed(std::uint32_t);
-long map(std::int32_t, std::int32_t, std::int32_t, std::int32_t, std::int32_t);
+std::int32_t map(std::int32_t, std::int32_t, std::int32_t, std::int32_t, std::int32_t);
 
 #endif
