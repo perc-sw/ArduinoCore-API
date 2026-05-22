@@ -311,8 +311,8 @@ std::uint16_t word(const Ts ... values) {
   return makeWord(values...);
 }
 
-void tone(uint8_t _pin, std::uint32_t frequency, std::uint32_t duration = 0);
-void noTone(uint8_t _pin);
+void tone(std::uint8_t, std::uint32_t, std::uint32_t = 0);
+void noTone(std::uint8_t);
 
 // WMath prototypes
 std::int32_t random(std::int32_t);
