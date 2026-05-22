@@ -17,15 +17,18 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#ifndef ARDUINO_CORE_API_SERVER_H
+#define ARDUINO_CORE_API_SERVER_H
 
 #include "Print.h"
 
 namespace arduino {
 
-class Server : public Print {
-  public:
-    virtual void begin() = 0;
-};
+  class Server : public Print {
+    public:
+      virtual void begin() = 0;
+  };
 
-}
+} // namespace arduino
+
+#endif // ARDUINO_CORE_API_SERVER_H

@@ -22,7 +22,7 @@
 
 #include <algorithm>
 #include <cstdint>
-#include<limits>
+#include <limits>
 #include <type_traits>
 #include "compiler_features.h"
 
@@ -58,22 +58,22 @@ enum BitOrder : std::uint8_t {
 #if HAS_MATH_CONSTANT_LIB()
   #include <numbers>
   template<typename T = double>
-  static CONSTEXPR auto PI           { std::numbers::pi_v<T> };
+  static constepxr auto PI           { std::numbers::pi_v<T> };
 
   template<typename T = double>
-  static CONSTEXPR auto HALF_PI      { PI<T> / static_cast<T>(2.0) };
+  static constepxr auto HALF_PI      { PI<T> / static_cast<T>(2.0) };
 
   template<typename T = double>
-  static CONSTEXPR auto TWO_PI       { PI<T> * static_cast<T>(2.0) };
+  static constepxr auto TWO_PI       { PI<T> * static_cast<T>(2.0) };
 
   template<typename T = double>
-  static CONSTEXPR auto DEG_TO_RAD   { PI<T> / static_cast<T>(180.0) };
+  static constepxr auto DEG_TO_RAD   { PI<T> / static_cast<T>(180.0) };
 
   template<typename T = double>
-  static CONSTEXPR auto RAD_TO_DEG   { static_cast<T>(180.0) / PI<T> };
+  static constepxr auto RAD_TO_DEG   { static_cast<T>(180.0) / PI<T> };
 
   template<typename T = double>
-  static CONSTEXPR auto EULER        { std::numbers::e_v<T> };
+  static constepxr auto EULER        { std::numbers::e_v<T> };
 #else
   static constexpr double PI          = 3.1415926535897932384626433832795;
   static constexpr double HALF_PI     = 1.5707963267948966192313216916398;
@@ -275,7 +275,7 @@ void pinMode(pin_size_t pinNumber, PinMode pinMode);
 void digitalWrite(pin_size_t pinNumber, PinStatus status);
 PinStatus digitalRead(pin_size_t pinNumber);
 int analogRead(pin_size_t pinNumber);
-void analogReference(uint8_t mode);
+void analogReference(std::uint8_t mode);
 void analogWrite(pin_size_t pinNumber, int value);
 
 std::uint32_t millis();
@@ -285,7 +285,7 @@ void delayMicroseconds(std::uint64_t us);
 std::uint32_t pulseIn(pin_size_t pin, uint8_t state, std::uint32_t timeout  = 1000000L);
 std::uint64_t pulseInLong(pin_size_t pin, uint8_t state, std::uint64_t timeout  = 1000000L);
 
-void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
+void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, std::uint8_t val);
 std::uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
 
 void attachInterrupt(pin_size_t interruptNumber, voidFuncPtr callback, PinStatus mode);
@@ -302,8 +302,8 @@ template<typename T>
 constexpr auto max(const T& a, const T& b){ return std::max(a, b); };
 
 /* C++ prototypes */
-uint16_t makeWord(uint16_t w);
-uint16_t makeWord(byte h, byte l);
+std::uint16_t makeWord(std::uint16_t w);
+std::uint16_t makeWord(byte h, byte l);
 
 template<typename ... Ts>
 std::uint16_t word(const Ts ... values) {

@@ -17,155 +17,124 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef Character_h
-#define Character_h
+#ifndef ARDUINO_CORE_API_WCHARACTER_H
+#define ARDUINO_CORE_API_WCHARACTER_H
 
-#include <ctype.h>
+#include <cctype>
 
 namespace arduino {
+  // WCharacter.h prototypes
+  inline bool isAlphaNumeric(int) __attribute__((always_inline));
+  inline bool isAlpha(int) __attribute__((always_inline));
+  inline bool isAscii(int) __attribute__((always_inline));
+  inline bool isWhitespace(int) __attribute__((always_inline));
+  inline bool isControl(int) __attribute__((always_inline));
+  inline bool isDigit(int) __attribute__((always_inline));
+  inline bool isGraph(int) __attribute__((always_inline));
+  inline bool isLowerCase(int) __attribute__((always_inline));
+  inline bool isPrintable(int) __attribute__((always_inline));
+  inline bool isPunct(int) __attribute__((always_inline));
+  inline bool isSpace(int) __attribute__((always_inline));
+  inline bool isUpperCase(int) __attribute__((always_inline));
+  inline bool isHexadecimalDigit(int) __attribute__((always_inline));
+  inline int toAscii(int) __attribute__((always_inline));
+  inline int toLowerCase(int) __attribute__((always_inline));
+  inline int toUpperCase(int)__attribute__((always_inline));
 
-// WCharacter.h prototypes
-inline bool isAlphaNumeric(int c) __attribute__((always_inline));
-inline bool isAlpha(int c) __attribute__((always_inline));
-inline bool isAscii(int c) __attribute__((always_inline));
-inline bool isWhitespace(int c) __attribute__((always_inline));
-inline bool isControl(int c) __attribute__((always_inline));
-inline bool isDigit(int c) __attribute__((always_inline));
-inline bool isGraph(int c) __attribute__((always_inline));
-inline bool isLowerCase(int c) __attribute__((always_inline));
-inline bool isPrintable(int c) __attribute__((always_inline));
-inline bool isPunct(int c) __attribute__((always_inline));
-inline bool isSpace(int c) __attribute__((always_inline));
-inline bool isUpperCase(int c) __attribute__((always_inline));
-inline bool isHexadecimalDigit(int c) __attribute__((always_inline));
-inline int toAscii(int c) __attribute__((always_inline));
-inline int toLowerCase(int c) __attribute__((always_inline));
-inline int toUpperCase(int c)__attribute__((always_inline));
+  // Checks for an alphanumeric character.
+  // It is equivalent to (isalpha(c) || isdigit(c)).
+  inline bool isAlphaNumeric(const int c)  {
+    return ( isalnum(c) != 0);
+  }
 
+  // Checks for an alphabetic character.
+  // It is equivalent to (isupper(c) || islower(c)).
+  inline bool isAlpha(const int c) {
+    return ( isalpha(c) != 0);
+  }
 
-// Checks for an alphanumeric character. 
-// It is equivalent to (isalpha(c) || isdigit(c)).
-inline bool isAlphaNumeric(int c) 
-{
-  return ( isalnum(c) == 0 ? false : true);
-}
+  // Checks whether c is a 7-bit unsigned char value
+  // that fits into the ASCII character set.
+  inline bool isAscii(const int c) {
+    return ((c & ~0x7f) == 0);
+  }
 
+  // Checks for a blank character, that is, a space or a tab.
+  inline bool isWhitespace(const int c) {
+    return ( c == '\t' || c == ' ');
+  }
 
-// Checks for an alphabetic character. 
-// It is equivalent to (isupper(c) || islower(c)).
-inline bool isAlpha(int c)
-{
-  return ( isalpha(c) == 0 ? false : true);
-}
+  // Checks for a control character.
+  inline bool isControl(const int c) {
+    return ( iscntrl(c) != 0);
+  }
 
+  // Checks for a digit (0 through 9).
+  inline bool isDigit(const int c) {
+    return ( isdigit(c) != 0);
+  }
 
-// Checks whether c is a 7-bit unsigned char value 
-// that fits into the ASCII character set.
-inline bool isAscii(int c)
-{
-  return ((c & ~0x7f) != 0 ? false : true );
-}
+  // Checks for any printable character except space.
+  inline bool isGraph(const int c) {
+    return ( isgraph(c) != 0);
+  }
 
+  // Checks for a lower-case character.
+  inline bool isLowerCase(const int c) {
+    return ( c >= 'a' && c <= 'z' );
+  }
 
-// Checks for a blank character, that is, a space or a tab.
-inline bool isWhitespace(int c)
-{
-  return ( c == '\t' || c == ' ');
-}
+  // Checks for any printable character including space.
+  inline bool isPrintable(const int c) {
+    return ( isprint(c) != 0);
+  }
 
+  // Checks for any printable character, which is not a space
+  // or an alphanumeric character.
+  inline bool isPunct(const int c) {
+    return ( isPrintable(c) && !isSpace(c) && !isAlphaNumeric(c) );
+  }
 
-// Checks for a control character.
-inline bool isControl(int c)
-{
-  return ( iscntrl (c) == 0 ? false : true);
-}
+  // Checks for white-space characters. For the avr-libc library,
+  // these are: space, formfeed ('\f'), newline ('\n'), carriage
+  // return ('\r'), horizontal tab ('\t'), and vertical tab ('\v').
+  inline bool isSpace(const int c) {
+    return ( isspace(c) != 0);
+  }
 
-
-// Checks for a digit (0 through 9).
-inline bool isDigit(int c)
-{
-  return ( isdigit (c) == 0 ? false : true);
-}
-
-
-// Checks for any printable character except space.
-inline bool isGraph(int c)
-{
-  return ( isgraph (c) == 0 ? false : true);
-}
-
-
-// Checks for a lower-case character.
-inline bool isLowerCase(int c)
-{
-  return ( c >= 'a' && c <= 'z' );
-}
-
-
-// Checks for any printable character including space.
-inline bool isPrintable(int c)
-{
-  return ( isprint (c) == 0 ? false : true);
-}
-
-
-// Checks for any printable character which is not a space 
-// or an alphanumeric character.
-inline bool isPunct(int c)
-{
-  return ( isPrintable(c) && !isSpace(c) && !isAlphaNumeric(c) );
-}
+  // Checks for an uppercase letter.
+  inline bool isUpperCase(const int c) {
+    return ( isupper(c) != 0);
+  }
 
 
-// Checks for white-space characters. For the avr-libc library, 
-// these are: space, formfeed ('\f'), newline ('\n'), carriage 
-// return ('\r'), horizontal tab ('\t'), and vertical tab ('\v').
-inline bool isSpace(int c)
-{
-  return ( isspace (c) == 0 ? false : true);
-}
+  // Checks for a hexadecimal digits, i.e. one of 0 1 2 3 4 5 6 7
+  // 8 9 a b c d e f A B C D E F.
+  inline bool isHexadecimalDigit(const int c) {
+    return ( isxdigit(c) != 0);
+  }
 
+  // Converts c to a 7-bit unsigned char value that fits into the
+  // ASCII character set by clearing the high-order bits.
+  inline int toAscii(const int c) {
+    return (c & 0x7f);
+  }
 
-// Checks for an uppercase letter.
-inline bool isUpperCase(int c)
-{
-  return ( isupper (c) == 0 ? false : true);
-}
+  // Warning:
+  // Many people will be unhappy if you use this function.
+  // This function will convert accented letters into random
+  // characters.
 
+  // Converts the letter c to lower case, if possible.
+  inline int toLowerCase(const int c) {
+    return tolower (c);
+  }
 
-// Checks for a hexadecimal digits, i.e. one of 0 1 2 3 4 5 6 7 
-// 8 9 a b c d e f A B C D E F.
-inline bool isHexadecimalDigit(int c)
-{
-  return ( isxdigit (c) == 0 ? false : true);
-}
-
-
-// Converts c to a 7-bit unsigned char value that fits into the 
-// ASCII character set, by clearing the high-order bits.
-inline int toAscii(int c)
-{
-  return (c & 0x7f);
-}
-
-
-// Warning:
-// Many people will be unhappy if you use this function. 
-// This function will convert accented letters into random 
-// characters.
-
-// Converts the letter c to lower case, if possible.
-inline int toLowerCase(int c)
-{
-  return tolower (c);
-}
-
-
-// Converts the letter c to upper case, if possible.
-inline int toUpperCase(int c)
-{
-  return toupper (c);
-}
+  // Converts the letter c to upper case, if possible.
+  inline int toUpperCase(const int c) {
+    return toupper (c);
+  }
 
 }
-#endif
+
+#endif /* ARDUINO_CORE_API_WCHARACTER_H */

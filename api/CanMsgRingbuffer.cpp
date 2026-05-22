@@ -27,48 +27,42 @@
  * NAMESPACE
  **************************************************************************************/
 
-namespace arduino
-{
+namespace arduino {
 
-/**************************************************************************************
- * CTOR/DTOR
- **************************************************************************************/
+  /**************************************************************************************
+   * CTOR/DTOR
+   **************************************************************************************/
 
-CanMsgRingbuffer::CanMsgRingbuffer()
-: _head{0}
-, _tail{0}
-, _num_elems{0}
-{
-}
+  CanMsgRingbuffer::CanMsgRingbuffer() : _head{ 0 }, _tail{ 0 }, _num_elems{ 0 } {
+  }
 
-/**************************************************************************************
- * PUBLIC MEMBER FUNCTIONS
- **************************************************************************************/
+  /**************************************************************************************
+   * PUBLIC MEMBER FUNCTIONS
+   **************************************************************************************/
 
-void CanMsgRingbuffer::enqueue(CanMsg const & msg)
-{
-  if (isFull())
-    return;
+  void CanMsgRingbuffer::enqueue(CanMsg const& msg) {
+    if (isFull())
+      return;
 
-  _buf[_head] = msg;
-  _head = next(_head);
-  _num_elems = _num_elems + 1;
-}
+    _buf[_head] = msg;
+    _head       = next(_head);
+    _num_elems  = _num_elems + 1;
+  }
 
-CanMsg CanMsgRingbuffer::dequeue()
-{
-  if (isEmpty())
-    return CanMsg();
+  CanMsg CanMsgRingbuffer::dequeue() {
+    if (isEmpty()) {
+      return {};
+    }
 
-  CanMsg const msg = _buf[_tail];
-  _tail = next(_tail);
-  _num_elems = _num_elems - 1;
+    const CanMsg msg = _buf[_tail];
+    _tail            = next(_tail);
+    _num_elems       = _num_elems - 1;
 
-  return msg;
-}
+    return msg;
+  }
 
-/**************************************************************************************
- * NAMESPACE
- **************************************************************************************/
+  /**************************************************************************************
+   * NAMESPACE
+   **************************************************************************************/
 
-} /* arduino */
+} // namespace arduino

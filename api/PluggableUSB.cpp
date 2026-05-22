@@ -17,85 +17,75 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "USBAPI.h"
 #include "PluggableUSB.h"
+#include "USBAPI.h"
 
 using namespace arduino;
 
-int PluggableUSB_::getInterface(uint8_t* interfaceCount)
-{
-	int sent = 0;
-	PluggableUSBModule* node;
-	for (node = rootNode; node; node = node->next) {
-		int res = node->getInterface(interfaceCount);
-		if (res < 0)
-			return -1;
-		sent += res;
-	}
-	return sent;
+bool PluggableUSB_::plug(PluggableUSBModule* node) {
+  if ((lastEp + node->numEndpoints) > totalEP) {
+    return false;
+  }
+
+  if (!rootNode) {
+    rootNode = node;
+  } else {
+    PluggableUSBModule* current = rootNode;
+    while (current->next) {
+      current = current->next;
+    }
+    current->next = node;
+  }
+
+  node->pluggedInterface = lastIf;
+  node->pluggedEndpoint  = lastEp;
+  lastIf += node->numInterfaces;
+  for (uint8_t i = 0; i < node->numEndpoints; i++) {
+    *(unsigned int*)(epBuffer(lastEp)) = node->endpointType[i];
+    lastEp++;
+  }
+  return true;
+  // restart USB layer???
 }
 
-int PluggableUSB_::getDescriptor(USBSetup& setup)
-{
-	PluggableUSBModule* node;
-	for (node = rootNode; node; node = node->next) {
-		int ret = node->getDescriptor(setup);
-		// ret!=0 -> request has been processed
-		if (ret)
-			return ret;
-	}
-	return 0;
+int PluggableUSB_::getInterface(uint8_t* interfaceCount) const {
+  int sent = 0;
+  for (PluggableUSBModule* node = rootNode; node; node = node->next) {
+    const int res = node->getInterface(interfaceCount);
+    if (res < 0)
+      return -1;
+    sent += res;
+  }
+  return sent;
 }
 
-void PluggableUSB_::getShortName(char *iSerialNum)
-{
-	PluggableUSBModule* node;
-	for (node = rootNode; node; node = node->next) {
-		iSerialNum += node->getShortName(iSerialNum);
-	}
-	*iSerialNum = 0;
+int PluggableUSB_::getDescriptor(USBSetup& setup) const {
+  for (PluggableUSBModule* node = rootNode; node; node = node->next) {
+    int ret = node->getDescriptor(setup);
+    // ret!=0 -> request has been processed
+    if (ret)
+      return ret;
+  }
+  return 0;
 }
 
-bool PluggableUSB_::setup(USBSetup& setup)
-{
-	PluggableUSBModule* node;
-	for (node = rootNode; node; node = node->next) {
-		if (node->setup(setup)) {
-			return true;
-		}
-	}
-	return false;
+bool PluggableUSB_::setup(USBSetup& setup) const {
+  for (PluggableUSBModule* node = rootNode; node; node = node->next) {
+    if (node->setup(setup)) {
+      return true;
+    }
+  }
+  return false;
 }
 
-bool PluggableUSB_::plug(PluggableUSBModule *node)
-{
-	if ((lastEp + node->numEndpoints) > totalEP) {
-		return false;
-	}
-
-	if (!rootNode) {
-		rootNode = node;
-	} else {
-		PluggableUSBModule *current = rootNode;
-		while (current->next) {
-			current = current->next;
-		}
-		current->next = node;
-	}
-
-	node->pluggedInterface = lastIf;
-	node->pluggedEndpoint = lastEp;
-	lastIf += node->numInterfaces;
-	for (uint8_t i = 0; i < node->numEndpoints; i++) {
-		*(unsigned int*)(epBuffer(lastEp)) = node->endpointType[i];
-		lastEp++;
-	}
-	return true;
-	// restart USB layer???
+void PluggableUSB_::getShortName(char* iSerialNum) const {
+  for (PluggableUSBModule* node = rootNode; node; node = node->next) {
+    iSerialNum += node->getShortName(iSerialNum);
+  }
+  *iSerialNum = 0;
 }
 
-PluggableUSB_& PluggableUSB()
-{
-	static PluggableUSB_ obj;
-	return obj;
+PluggableUSB_& PluggableUSB() {
+  static PluggableUSB_ obj;
+  return obj;
 }

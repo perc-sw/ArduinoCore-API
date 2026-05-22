@@ -17,32 +17,33 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#ifndef ARDUINO_CORE_API_HARDWARE_I2C_H
+#define ARDUINO_CORE_API_HARDWARE_I2C_H
 
-#include <inttypes.h>
+#include <cstdint>
 #include "Stream.h"
 
 namespace arduino {
 
-class HardwareI2C : public Stream
-{
-  public:
-    virtual void begin() = 0;
-    virtual void begin(uint8_t address) = 0;
-    virtual void end() = 0;
+  class HardwareI2C : public Stream {
+    public:
+      virtual void begin() = 0;
+      virtual void begin(std::uint8_t address) = 0;
+      virtual void end() = 0;
 
-    virtual void setClock(uint32_t freq) = 0;
-  
-    virtual void beginTransmission(uint8_t address) = 0;
-    virtual uint8_t endTransmission(bool stopBit) = 0;
-    virtual uint8_t endTransmission(void) = 0;
+      virtual void setClock(std::uint32_t freq) = 0;
 
-    virtual size_t requestFrom(uint8_t address, size_t len, bool stopBit) = 0;
-    virtual size_t requestFrom(uint8_t address, size_t len) = 0;
+      virtual void beginTransmission(std::uint8_t address) = 0;
+      virtual std::uint8_t endTransmission(bool stopBit) = 0;
+      virtual std::uint8_t endTransmission() = 0;
 
-    virtual void onReceive(void(*)(int)) = 0;
-    virtual void onRequest(void(*)(void)) = 0;
-};
+      virtual std::size_t requestFrom(std::uint8_t address, std::size_t len, bool stopBit) = 0;
+      virtual std::size_t requestFrom(std::uint8_t address, std::size_t len) = 0;
+
+      virtual void onReceive(void(*)(int)) = 0;
+      virtual void onRequest(void(*)()) = 0;
+  };
 
 }
 
+#endif

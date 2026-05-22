@@ -16,82 +16,85 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef ARDUINO_CORE_API_PRINT_H
+#define ARDUINO_CORE_API_PRINT_H
 
-#pragma once
-
-#include <inttypes.h>
-#include <stdio.h> // for size_t
+#include <cstdint>
+#include <cstdio>
 
 #include "String.h"
 #include "Printable.h"
 
-#define DEC 10
-#define HEX 16
-#define OCT 8
-#define BIN 2
+static constexpr std::uint8_t DEC { 10 };
+static constexpr std::uint8_t HEX { 16 };
+static constexpr std::uint8_t OCT { 8 };
+static constexpr std::uint8_t BIN { 2 };
 
 namespace arduino {
 
-class Print
-{
-  private:
-    int write_error;
-    size_t printNumber(unsigned long, uint8_t);
-    size_t printULLNumber(unsigned long long, uint8_t);
-    size_t printFloat(double, int);
-  protected:
-    void setWriteError(int err = 1) { write_error = err; }
-  public:
-    Print() : write_error(0) {}
+  class Print {
+      int write_error;
+      std::size_t printNumber(std::uint32_t, std::uint8_t);
+      std::size_t printULLNumber(std::uint64_t, std::uint8_t);
+      std::size_t printFloat(double, int);
+    protected:
+      void setWriteError(const int err = 1) { write_error = err; }
+    public:
+      Print() : write_error(0) {}
+      virtual ~Print() = default;
 
-    int getWriteError() { return write_error; }
-    void clearWriteError() { setWriteError(0); }
+      [[nodiscard]] int getWriteError() const { return write_error; }
+      void clearWriteError() { setWriteError(0); }
 
-    virtual size_t write(uint8_t) = 0;
-    size_t write(const char *str) {
-      if (str == NULL) return 0;
-      return write((const uint8_t *)str, strlen(str));
-    }
-    virtual size_t write(const uint8_t *buffer, size_t size);
-    size_t write(const char *buffer, size_t size) {
-      return write((const uint8_t *)buffer, size);
+      virtual std::size_t write(std::uint8_t) = 0;
+      std::size_t write(const char *str) {
+      if (str == nullptr) return 0;
+      return write(reinterpret_cast<const uint8_t *>(str), strlen(str));
     }
 
-    // default to zero, meaning "a single write may block"
-    // should be overridden by subclasses with buffering
-    virtual int availableForWrite() { return 0; }
+      virtual std::size_t write(const std::uint8_t *buffer, std::size_t size);
+      std::size_t write(const char *buffer, const std::size_t size) {
+      return write(reinterpret_cast<const std::uint8_t *>(buffer), size);
+    }
 
-    size_t print(const __FlashStringHelper *);
-    size_t print(const String &);
-    size_t print(const char[]);
-    size_t print(char);
-    size_t print(unsigned char, int = DEC);
-    size_t print(int, int = DEC);
-    size_t print(unsigned int, int = DEC);
-    size_t print(long, int = DEC);
-    size_t print(unsigned long, int = DEC);
-    size_t print(long long, int = DEC);
-    size_t print(unsigned long long, int = DEC);
-    size_t print(double, int = 2);
-    size_t print(const Printable&);
+      // default to zero, meaning "a single write may block"
+      // should be overridden by subclasses with buffering
+      virtual int availableForWrite() { return 0; }
 
-    size_t println(const __FlashStringHelper *);
-    size_t println(const String &s);
-    size_t println(const char[]);
-    size_t println(char);
-    size_t println(unsigned char, int = DEC);
-    size_t println(int, int = DEC);
-    size_t println(unsigned int, int = DEC);
-    size_t println(long, int = DEC);
-    size_t println(unsigned long, int = DEC);
-    size_t println(long long, int = DEC);
-    size_t println(unsigned long long, int = DEC);
-    size_t println(double, int = 2);
-    size_t println(const Printable&);
-    size_t println(void);
+      std::size_t print(const __FlashStringHelper *);
+      std::size_t print(const String &);
+      std::size_t print(const char[]);
+      std::size_t print(char);
+      std::size_t print(std::uint8_t, int = DEC);
+      std::size_t print(int, int = DEC);
+      std::size_t print(unsigned int, int = DEC);
+      std::size_t print(std::int32_t, int = DEC);
+      std::size_t print(std::uint32_t, int = DEC);
+      std::size_t print(std::int64_t, int = DEC);
+      std::size_t print(std::uint64_t, int = DEC);
+      std::size_t print(double, int = 2);
+      std::size_t print(const Printable&);
 
-    virtual void flush() { /* Empty implementation for backward compatibility */ }
-};
+      std::size_t println(const __FlashStringHelper *);
+      std::size_t println(const String &s);
+      std::size_t println(const char[]);
+      std::size_t println(char);
+      std::size_t println(std::uint8_t, int = DEC);
+      std::size_t println(int, int = DEC);
+      std::size_t println(unsigned int, int = DEC);
+      std::size_t println(std::int32_t, int = DEC);
+      std::size_t println(std::uint32_t, int = DEC);
+      std::size_t println(std::int64_t, int = DEC);
+      std::size_t println(std::uint64_t, int = DEC);
+      std::size_t println(double, int = 2);
+      std::size_t println(const Printable&);
+      std::size_t println();
+
+      virtual void flush() { /* Empty implementation for backward compatibility */ }
+  };
 
 }
+
 using arduino::Print;
+
+#endif

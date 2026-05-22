@@ -16,31 +16,36 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef ARDUINO_CORE_API_CLIENT_H
+#define ARDUINO_CORE_API_CLIENT_H
 
-#pragma once
-
-#include "Stream.h"
 #include "IPAddress.h"
+#include "Stream.h"
 
 namespace arduino {
 
-class Client : public Stream {
+  class Client : public Stream {
 
-public:
-  virtual int connect(IPAddress ip, uint16_t port) =0;
-  virtual int connect(const char *host, uint16_t port) =0;
-  virtual size_t write(uint8_t) =0;
-  virtual size_t write(const uint8_t *buf, size_t size) =0;
-  virtual int available() = 0;
-  virtual int read() = 0;
-  virtual int read(uint8_t *buf, size_t size) = 0;
-  virtual int peek() = 0;
-  virtual void flush() = 0;
-  virtual void stop() = 0;
-  virtual uint8_t connected() = 0;
-  virtual operator bool() = 0;
-protected:
-  uint8_t* rawIPAddress(IPAddress& addr) { return addr.raw_address(); };
-};
+    public:
+      virtual int     connect(IPAddress ip, uint16_t port)     = 0;
+      virtual int     connect(const char* host, uint16_t port) = 0;
+      virtual size_t  write(uint8_t)                           = 0;
+      virtual size_t  write(const uint8_t* buf, size_t size)   = 0;
+      virtual int     available()                              = 0;
+      virtual int     read()                                   = 0;
+      virtual int     read(uint8_t* buf, size_t size)          = 0;
+      virtual int     peek()                                   = 0;
+      virtual void    flush()                                  = 0;
+      virtual void    stop()                                   = 0;
+      virtual uint8_t connected()                              = 0;
+      virtual         operator bool()                          = 0;
 
-}
+    protected:
+      uint8_t* rawIPAddress(IPAddress& addr) {
+        return addr.raw_address();
+      };
+  };
+
+} // namespace arduino
+
+#endif // ARDUINO_CORE_API_CLIENT_H

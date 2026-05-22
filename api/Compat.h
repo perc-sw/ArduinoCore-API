@@ -17,8 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef __COMPAT_H__
-#define __COMPAT_H__
+#ifndef ARDUINO_CORE_API_COMPAT_H
+#define ARDUINO_CORE_API_COMPAT_H
 
 namespace arduino {
 
@@ -32,4 +32,4 @@ inline void digitalWrite(const pin_size_t pinNumber, int status) {
 
 }
 
-#endif
+#endif /* ARDUINO_CORE_API_COMPAT_H */

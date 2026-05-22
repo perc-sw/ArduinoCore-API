@@ -16,14 +16,13 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
-
 #include "Common.h"
 
 /* C++ prototypes */
-long map(long x, long in_min, long in_max, long out_min, long out_max)
-{
+std::int32_t map(const std::int32_t x, const std::int32_t in_min, const std::int32_t in_max,
+                 const std::int32_t out_min, const std::int32_t out_max){
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-uint16_t makeWord(uint16_t w) { return w; }
-uint16_t makeWord(uint8_t h, uint8_t l) { return (h << 8) | l; }
+std::uint16_t makeWord(const std::uint16_t w) { return w; }
+std::uint16_t makeWord(const byte h, const byte l) { return (h << 8) | l; }

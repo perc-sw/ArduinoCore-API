@@ -17,24 +17,27 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#ifndef ARDUINO_CORE_API_PRINTABLE_H
+#define ARDUINO_CORE_API_PRINTABLE_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace arduino {
 
-class Print;
+  class Print;
 
-/** The Printable class provides a way for new classes to allow themselves to be printed.
-    By deriving from Printable and implementing the printTo method, it will then be possible
-    for users to print out instances of this class by passing them into the usual
-    Print::print and Print::println methods.
-*/
+  /** The Printable class provides a way for new classes to allow themselves to be printed.
+      By deriving from Printable and implementing the printTo method, it will then be possible
+      for users to print out instances of this class by passing them into the usual
+      Print::print and Print::println methods.
+  */
 
-class Printable
-{
-  public:
-    virtual size_t printTo(Print& p) const = 0;
-};
+  class Printable {
+    public:
+      virtual ~Printable() = default;
+      virtual std::size_t printTo(Print& p) const = 0;
+  };
 
 }
+
+#endif

@@ -17,7 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#ifndef ARDUINO_CORE_API_ITOA_H
+#define ARDUINO_CORE_API_ITOA_H
 
 // Standard C functions required in Arduino API
 // If these functions are not provided by the standard library, the
@@ -36,3 +37,4 @@ extern char* ultoa(unsigned long value, char *string, int radix);
 } // extern "C"
 #endif
 
+#endif

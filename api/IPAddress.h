@@ -17,9 +17,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#ifndef ARDUINO_CORE_API_IPADDRESS_H
+#define ARDUINO_CORE_API_IPADDRESS_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "Printable.h"
 #include "String.h"
 
@@ -33,90 +34,103 @@ class DNSClient;
 
 namespace arduino {
 
-// A class to make it easier to handle and pass around IP addresses
+  // A class to make it easier to handle and pass around IP addresses
 
-enum IPType {
-    IPv4,
-    IPv6
-};
+  enum IPType { IPv4, IPv6 };
 
-class IPAddress : public Printable {
-private:
-    union {
-        uint8_t bytes[16];
-        uint32_t dword[4];
-    } _address;
-    IPType _type;
+  class IPAddress : public Printable {
+    private:
+      union {
+          uint8_t  bytes[16];
+          uint32_t dword[4];
+      } _address;
+      IPType _type;
 
-    // Access the raw byte array containing the address.  Because this returns a pointer
-    // to the internal structure rather than a copy of the address this function should only
-    // be used when you know that the usage of the returned uint8_t* will be transient and not
-    // stored.
-    uint8_t* raw_address() { return _type == IPv4 ? &_address.bytes[IPADDRESS_V4_BYTES_INDEX] : _address.bytes; }
+      // Access the raw byte array containing the address.  Because this returns a pointer
+      // to the internal structure rather than a copy of the address this function should only
+      // be used when you know that the usage of the returned uint8_t* will be transient and not
+      // stored.
+      uint8_t* raw_address() {
+        return _type == IPv4 ? &_address.bytes[IPADDRESS_V4_BYTES_INDEX] : _address.bytes;
+      }
 
-public:
-    // Constructors
+    public:
+      // Constructors
 
-    // Default IPv4
-    IPAddress();
-    IPAddress(IPType ip_type);
-    IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
-    IPAddress(uint8_t o1, uint8_t o2, uint8_t o3, uint8_t o4, uint8_t o5, uint8_t o6, uint8_t o7, uint8_t o8, uint8_t o9, uint8_t o10, uint8_t o11, uint8_t o12, uint8_t o13, uint8_t o14, uint8_t o15, uint8_t o16);
-     // IPv4; see implementation note
-    IPAddress(uint32_t address);
-     // Default IPv4
-    IPAddress(const uint8_t *address);
-    IPAddress(IPType ip_type, const uint8_t *address);
-    // If IPv4 fails tries IPv6 see fromString function
-    IPAddress(const char *address);
+      // Default IPv4
+      IPAddress();
+      explicit IPAddress(IPType);
+      IPAddress(std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t);
+      IPAddress(std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t,
+                std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t);
 
-    bool fromString(const char *address);
-    bool fromString(const String &address) { return fromString(address.c_str()); }
+      // IPv4; see implementation note
+      explicit IPAddress(std::uint32_t);
 
-    // Overloaded cast operator to allow IPAddress objects to be used where a uint32_t is expected
-    // NOTE: IPv4 only; see implementation note
-    operator uint32_t() const { return _type == IPv4 ? _address.dword[IPADDRESS_V4_DWORD_INDEX] : 0; };
+      // Default IPv4
+      explicit IPAddress(const std::uint8_t*);
+      IPAddress(IPType, const std::uint8_t*);
 
-    bool operator==(const IPAddress& addr) const;
-    bool operator!=(const IPAddress& addr) const { return !(*this == addr); };
+      // If IPv4 fails tries IPv6 see fromString function
+      explicit IPAddress(const char*);
 
-    // NOTE: IPv4 only; we don't know the length of the pointer
-    bool operator==(const uint8_t* addr) const;
+      bool fromString(const char*);
+      bool fromString(const String& address) {
+        return fromString(address.c_str());
+      }
 
-    // Overloaded index operator to allow getting and setting individual octets of the address
-    uint8_t operator[](int index) const;
-    uint8_t& operator[](int index);
+      // Overloaded cast operator to allow IPAddress objects to be used where a uint32_t is expected
+      // NOTE: IPv4 only; see implementation note
+      explicit operator std::uint32_t() const {
+        return _type == IPv4 ? _address.dword[IPADDRESS_V4_DWORD_INDEX] : 0;
+      };
 
-    // Overloaded copy operators to allow initialisation of IPAddress objects from other types
-    // NOTE: IPv4 only
-    IPAddress& operator=(const uint8_t *address);
-    // NOTE: IPv4 only; see implementation note
-    IPAddress& operator=(uint32_t address);
-    // If IPv4 fails tries IPv6 see fromString function
-    IPAddress& operator=(const char *address);
+      bool operator==(const IPAddress&) const;
+      bool operator!=(const IPAddress& addr) const {
+        return !(*this == addr);
+      };
 
-    virtual size_t printTo(Print& p) const;
-    String toString() const;
+      // NOTE: IPv4 only; we don't know the length of the pointer
+      bool operator==(const std::uint8_t*) const;
 
-    IPType type() const { return _type; }
+      // Overloaded index operator to allow getting and setting individual octets of the address
+      std::uint8_t  operator[](int) const;
+      std::uint8_t& operator[](int);
 
-    friend class UDP;
-    friend class Client;
-    friend class Server;
-    
-    friend ::EthernetClass;
-    friend ::DhcpClass;
-    friend ::DNSClient;
+      // Overloaded copy operators to allow initialization of IPAddress objects from other types
+      // NOTE: IPv4 only
+      IPAddress& operator=(const std::uint8_t*);
+      // NOTE: IPv4 only; see implementation note
+      IPAddress& operator=(std::uint32_t);
+      // If IPv4 fails tries IPv6 see fromString function
+      IPAddress& operator=(const char*);
 
-protected:
-    bool fromString4(const char *address);
-    bool fromString6(const char *address);
-    String toString4() const;
-    String toString6() const;
-};
+      virtual std::size_t printTo(Print& p) const;
+      [[nodiscard]] String         toString() const;
 
-extern const IPAddress IN6ADDR_ANY;
-extern const IPAddress INADDR_NONE;
-}
+      [[nodiscard]] IPType type() const {
+        return _type;
+      }
+
+      friend class UDP;
+      friend class Client;
+      friend class Server;
+
+      friend ::EthernetClass;
+      friend ::DhcpClass;
+      friend ::DNSClient;
+
+    protected:
+      bool   fromString4(const char* address);
+      bool   fromString6(const char* address);
+      [[nodiscard]] String toString4() const;
+      [[nodiscard]] String toString6() const;
+  };
+
+  extern const IPAddress IN6ADDR_ANY;
+  extern const IPAddress INADDR_NONE;
+} // namespace arduino
 
 using arduino::IPAddress;
+
+#endif // ARDUINO_CORE_API_IPADDRESS_H
