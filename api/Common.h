@@ -271,12 +271,12 @@ using pin_size_t = std::uint32_t;
 using pin_size_t = std::uint8_t;
 #endif
 
-void pinMode(pin_size_t pinNumber, PinMode pinMode);
-void digitalWrite(pin_size_t pinNumber, PinStatus status);
-PinStatus digitalRead(pin_size_t pinNumber);
-int analogRead(pin_size_t pinNumber);
-void analogReference(std::uint8_t mode);
-void analogWrite(pin_size_t pinNumber, int value);
+void pinMode(pin_size_t, PinMode);
+void digitalWrite(pin_size_t, PinStatus);
+PinStatus digitalRead(pin_size_t);
+std::uint16_t analogRead(pin_size_t);
+void analogReference(std::uint8_t);
+void analogWrite(pin_size_t, std::uint16_t);
 
 std::uint32_t millis();
 std::uint64_t micros();
